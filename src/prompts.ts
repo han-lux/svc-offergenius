@@ -67,6 +67,6 @@ export function offerGeniusPrompt(offer: string, hotelName: string) {
 
     Answer using the following JSON data and the information contained in this JSON data only (do not use the example data above), and then respond ONLY in JSON format.
 
-    ${JSON.stringify(offer)}
+    ${offer}
     `
 }
