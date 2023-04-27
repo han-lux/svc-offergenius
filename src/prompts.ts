@@ -4,7 +4,7 @@ export function offerGeniusPrompt(offer: string) {
 
     When you answer a question, provide a reference to the verbatim text in the JSON data that you used to determine this answer. Structure your response in JSON format of an array that contains one or more objects with an 'answer' and 'reference' property.
 
-    Your response would look like this:
+    Your response format is:
 
     {
         "answers":[
@@ -15,7 +15,10 @@ export function offerGeniusPrompt(offer: string) {
         ]
     }
 
-    The following are some example questions followed by example responses
+    The following are some example questions followed by example responses. Do not use the information in these examples to respond to future queries.
+
+    ---
+
     Is parking available?
     {
         "answers": [
@@ -59,6 +62,10 @@ export function offerGeniusPrompt(offer: string) {
             }
         ]
     }
+
+    ---
+
+    Answer using the following JSON data and the information contained in this JSON data only (do not use the example data above), and then respond ONLY in JSON format.
 
     ${offer}
     `
