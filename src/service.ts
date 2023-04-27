@@ -27,13 +27,14 @@ export class OfferGeniusService {
   }: CustomerSupportQuestion) {
     const offer = await this.fetchOffer(offerId);
     console.log("Answering query for: ", offer.name);
+    console.log("Using prompt: ", offerGeniusPrompt(offer, offer.name)); 
     const answer = await this.api.createChatCompletion({
       model: "gpt-3.5-turbo",
       temperature: 0,
       messages: [
         {
           role: "system",
-          content: offerGeniusPrompt(offer),
+          content: offerGeniusPrompt(offer.copy, offer.name),
         },
         { role: "user", content: question },
       ],
