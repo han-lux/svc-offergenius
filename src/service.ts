@@ -1,4 +1,5 @@
 import { Configuration, OpenAIApi } from "openai";
+import { encode } from "gpt-3-encoder"; 
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -17,4 +18,9 @@ export class OfferGeniusService {
   }
 
   async answerCustomerSupportQuestion({ offerId, question  }: CustomerSupportQuestion) {}
+
+  countToken(message: string): number {
+    const encoded = encode(message);
+    return encode.length;
+  }
 }

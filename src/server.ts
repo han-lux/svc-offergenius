@@ -1,4 +1,5 @@
 import express from "express";
+import { OfferGeniusService } from "./service";
 const port = process.env.PORT || 4000;
 
 export function startServer() {
@@ -10,5 +11,7 @@ export function startServer() {
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Endpoint")
+  const offerGenius = new OfferGeniusService()
+  const tokenCount = offerGenius.countToken("Endpoint")
+  res.status(200).send(tokenCount)
 });
