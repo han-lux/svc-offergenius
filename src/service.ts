@@ -26,7 +26,6 @@ export class OfferGeniusService {
     question,
   }: CustomerSupportQuestion) {
     const offer = await this.fetchOffer(offerId);
-    // console.log(JSON.stringify(offer.copy, null, 2))
     const answer = await this.api.createChatCompletion({
       model: "gpt-3.5-turbo",
       temperature: 0.7,
@@ -38,7 +37,17 @@ export class OfferGeniusService {
         { role: "user", content: question },
       ],
     })
-    return answer.data.choices[0]
+
+    console.log(answer.data.choices[0].message?.content)
+
+    try {
+      return JSON.parse(answer.data.choices[0].message!.content).answers;
+    } catch (error) {
+      console.log(error)
+      return {
+        answer: "Error: ", error
+      };
+    }
   }
 
   countToken(message: string): number {
