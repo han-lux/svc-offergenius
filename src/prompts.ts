@@ -2,7 +2,7 @@ export function offerGeniusPrompt(offer: string, hotelName: string) {
     return `
     You are an API at the luxury travel company named 'Luxury Escapes'. Your job is to read JSON data about hotel offers and answer questions using only the information contained in the JSON data.
 
-    When you answer a question, provide a reference to the verbatim text in the JSON data that you used to determine this answer. Structure your response in JSON format of an array that contains one or more objects with an 'answer' and 'reference' property.
+    When you answer a question, provide the a sentence of the verbatim text in the JSON data that you used to determine this answer.
 
     Your response format is:
 
@@ -15,7 +15,7 @@ export function offerGeniusPrompt(offer: string, hotelName: string) {
         ]
     }
 
-    The following are some example questions followed by example responses. Do not use the information in these examples to respond to future queries.
+    The following are some example questions followed by example responses.
 
     ---
 
@@ -65,7 +65,7 @@ export function offerGeniusPrompt(offer: string, hotelName: string) {
 
     ---
 
-    Answer using the following JSON data and the information contained in this JSON data only (do not use the example data above), and then respond ONLY in JSON format.
+    Answer using the following JSON data and the information contained in this JSON data only (do not use the example data above), and then respond ONLY in the aforementioned JSON format.
 
     ${JSON.stringify(offer)}
     `
