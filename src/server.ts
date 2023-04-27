@@ -13,5 +13,5 @@ const app = express();
 app.get("/", (req, res) => {
   const offerGenius = new OfferGeniusService()
   const tokenCount = offerGenius.countToken("Endpoint")
-  res.status(200).send(tokenCount)
+  res.status(200).send({ tokenCount })
 });

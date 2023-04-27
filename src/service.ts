@@ -21,6 +21,6 @@ export class OfferGeniusService {
 
   countToken(message: string): number {
     const encoded = encode(message);
-    return encode.length;
+    return encoded.length;
   }
 }
