@@ -12,8 +12,9 @@ const app = express();
 
 app.get("/", async (req, res) => {
   const { question = '', offerId = '0062y000003GPzRAAW' } = req.query as Record<string, string>;
+  const bearerToken = req.headers.authorization;
   const offerGenius = new OfferGeniusService()
-  const answer = await offerGenius.answerCustomerSupportQuestion({ question, offerId })
+  const answer = await offerGenius.answerCustomerSupportQuestion({ question, offerId }, bearerToken)
   const tokenCount = offerGenius.countToken(question)
   res.status(200).send({ tokenCount, answer })
 });

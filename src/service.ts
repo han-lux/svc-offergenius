@@ -12,12 +12,30 @@ interface CustomerSupportQuestion {
 }
 
 export class OfferGeniusService {
-  constructor(private readonly api = new OpenAIApi(configuration)) {}
+  constructor(
+    private readonly isProdEnv = false,
+    private readonly api = new OpenAIApi(configuration),
+    private readonly offersCache = new Map<string, string>()
+  ) {}
 
-  async fetchOffer(offerId: string): Promise<any> {
-    const url = `https://api.luxuryescapes.com/api/v2/public-offers/${offerId}?flightOrigin=SYD&region=AU&allPackages=false&brand=luxuryescapes`;
-    const response = await fetch(url);
+
+  async fetchOffer(offerId: string, token?: string): Promise<any> {
+    if (this.offersCache.has(offerId)) {
+      return this.offersCache.get(offerId);
+    }
+    const headers = new Headers();
+    if (token) {
+      headers.set('Authorization', token);
+    }
+    // const url = !this.isProdEnv ? `https://cdn.test.luxuryescapes.com/api/offers/${offerId}` : `https://api.luxuryescapes.com/api/v2/public-offers/${offerId}?flightOrigin=SYD&region=AU&allPackages=false&brand=luxuryescapes`;
+    const url = !this.isProdEnv ? `https://cdn.test.luxuryescapes.com/api/v2/public-offers/${offerId}?flightOrigin=SYD&region=AU&allPackages=false&brand=luxuryescapes` : `https://api.luxuryescapes.com/api/v2/public-offers/${offerId}?flightOrigin=SYD&region=AU&allPackages=false&brand=luxuryescapes`;
+    const response = await fetch(url, {
+      headers
+    });
     const data = await response.json();
+    if (data) {
+      this.offersCache.set(offerId, data.result);
+    }
     return data.result;
   }
 
@@ -42,7 +60,7 @@ export class OfferGeniusService {
         },
         { role: "user", content: question },
       ],
-    })
+    });
 
     const answerContent = answer.data.choices[0].message!.content
 
@@ -72,6 +90,21 @@ export class OfferGeniusService {
         }
       ]
     };
+  }
+
+  translate(data: any): string {
+    if (!data) {
+      return data;
+    }
+    return Object.entries(data)
+      .filter(([key, val]) => !!key && !!val)
+      .reduce(
+        (summary, [key, val]) =>
+          `${summary}\n${key} is "${
+            typeof val === "object" ? `\n--\n${this.translate(val)}` : val
+          }"\n`,
+        ""
+      );
   }
 
   transformOffer(offer: any): any {
