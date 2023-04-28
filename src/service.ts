@@ -45,10 +45,17 @@ export class OfferGeniusService {
   }: CustomerSupportQuestion, token?: string) {
     const offer = await this.fetchOffer(offerId, token);
     const slimOffer = this.transformOffer(offer);
+    const tokenCount = this.countToken(JSON.stringify(slimOffer));
+
+    if (tokenCount > 4000) {
+      return {
+        error: `Token count too large (${tokenCount})`
+      }
+    }
 
     console.log("Answering query for: ", slimOffer.name);
-    console.log("Query token count: ", this.countToken(JSON.stringify(slimOffer)))
-    console.log("Using prompt: ", offerGeniusPrompt(slimOffer)); 
+    console.log("Query token count: ", tokenCount);
+    // console.log("Using prompt: ", offerGeniusPrompt(slimOffer)); 
 
     const answer = await this.api.createChatCompletion({
       model: "gpt-3.5-turbo",
@@ -109,18 +116,26 @@ export class OfferGeniusService {
 
   transformOffer(offer: any): any {
     const slimPackages: object[] = []
+    let count = 0;
     for (const packageId in offer.packages) {
+      count++
+      if (count > 2) { break }
+
       const offerPackage = offer.packages[packageId]
       slimPackages.push({
         name: offerPackage.name,
         copy: offerPackage.copy,
         includedGuestsLabel: offerPackage.includedGuestsLabel,
-        inclusions: offerPackage.inclusions
+        // inclusions: offerPackage.inclusions // Lots of duplicate copy, also in offer.inclusions
       })
     }
 
     const slimRoomTypes: object[] = []
+    count = 0;
     for (const roomTypeId in offer.roomTypes) {
+      count++
+      if (count > 2) { break }
+
       const roomType = offer.roomTypes[roomTypeId]
       slimRoomTypes.push({
         name: roomType.name,
@@ -134,18 +149,20 @@ export class OfferGeniusService {
     return {
       name: offer.name,
       copy: offer.copy,
-      // packages: slimPackages,
+      packages: slimPackages,
       property: {
         name: offer.property.name,
         address: offer.property.address,
         childrenPolicy: offer.property.childrenPolicy,
         ageCategories: offer.property.ageCategories,
-        reviews: offer.property.reviews
+        // reviews: offer.property.reviews
       },
       roomTypes: slimRoomTypes,
       location: offer.location,
       tags: offer.tags,
-      // inclusions: offer.inclusions
+      inclusions: offer.inclusions,
+      numberOfNightsMin: offer.numberOfNightsMin,
+      numberOfNightsMax: offer.numberOfNightsMax
     }
   }
 
