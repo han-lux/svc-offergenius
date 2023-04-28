@@ -13,7 +13,7 @@ interface CustomerSupportQuestion {
 
 export class OfferGeniusService {
   constructor(
-    private readonly isProdEnv = false,
+    private readonly isProdEnv = true,
     private readonly api = new OpenAIApi(configuration),
     private readonly offersCache = new Map<string, string>()
   ) {}
@@ -42,8 +42,8 @@ export class OfferGeniusService {
   async answerCustomerSupportQuestion({
     offerId,
     question,
-  }: CustomerSupportQuestion) {
-    const offer = await this.fetchOffer(offerId);
+  }: CustomerSupportQuestion, token?: string) {
+    const offer = await this.fetchOffer(offerId, token);
     const slimOffer = this.transformOffer(offer);
 
     console.log("Answering query for: ", slimOffer.name);
@@ -134,7 +134,7 @@ export class OfferGeniusService {
     return {
       name: offer.name,
       copy: offer.copy,
-      packages: slimPackages,
+      // packages: slimPackages,
       property: {
         name: offer.property.name,
         address: offer.property.address,
@@ -145,7 +145,7 @@ export class OfferGeniusService {
       roomTypes: slimRoomTypes,
       location: offer.location,
       tags: offer.tags,
-      inclusions: offer.inclusions
+      // inclusions: offer.inclusions
     }
   }
 
