@@ -53,7 +53,7 @@ export class OfferGeniusService {
       }
     }
 
-    console.log("Answering query for: ", slimOffer.name);
+    console.log("Answering query for: ", slimOffer.name || 'unknown');
     console.log("Query token count: ", tokenCount);
     // console.log("Using prompt: ", offerGeniusPrompt(slimOffer)); 
 
@@ -123,7 +123,7 @@ export class OfferGeniusService {
 
       const offerPackage = offer.packages[packageId]
       slimPackages.push({
-        name: offerPackage.name,
+        name: offerPackage.name || 'unknown',
         copy: offerPackage.copy,
         includedGuestsLabel: offerPackage.includedGuestsLabel,
         // inclusions: offerPackage.inclusions // Lots of duplicate copy, also in offer.inclusions
