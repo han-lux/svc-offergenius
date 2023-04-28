@@ -1,6 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 import { encode } from "gpt-3-encoder";
-import { offerGeniusPrompt } from "./prompts";
+import { offerGeniusPrompt, offerGeniusQuotationPrompt } from "./prompts";
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -42,41 +42,48 @@ export class OfferGeniusService {
   async answerCustomerSupportQuestion({
     offerId,
     question,
-  }: CustomerSupportQuestion, token?: string) {
-    const offer = await this.fetchOffer(offerId, token);
-    console.log(offer);
-    const humanReadablePrompt = offerGeniusPrompt(
-      this.translate(this.isProdEnv ? offer.copy : offer.copy),
-      offer.name
-    );
+  }: CustomerSupportQuestion) {
+    const offer = await this.fetchOffer(offerId);
 
     console.log("Answering query for: ", offer.name);
-    console.log("Using prompt: ", humanReadablePrompt);
+    console.log("Using prompt: ", offerGeniusPrompt(offer.copy)); 
 
     const answer = await this.api.createChatCompletion({
       model: "gpt-3.5-turbo",
-      temperature: 0,
+      temperature: 0.7,
       messages: [
         {
           role: "system",
-          content: humanReadablePrompt,
+          content: offerGeniusPrompt(offer.copy),
         },
         { role: "user", content: question },
       ],
     });
 
-    console.log(answer.data.choices[0].message?.content);
+    const answerContent = answer.data.choices[0].message!.content
 
-    try {
-      return JSON.parse(answer.data.choices[0].message!.content).answers;
-    } catch (error) {
-      console.log(error);
-      return {
-        answer:
-          "There was an error trying to answer this question. Please try again",
-        error,
-      };
-    }
+    const quotation = await this.api.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      temperature: 0.7,
+      messages: [
+        { role: "system", content: offerGeniusPrompt(offer.copy) },
+        { role: "user", content: question },
+        { role: "assistant", content: answerContent },
+        { role: "user", content: offerGeniusQuotationPrompt() }
+      ],
+    })
+
+    console.log(quotation.data.choices)
+    const quotationContent = quotation.data.choices[0].message!.content
+
+    return {
+      answers: [
+        {
+          answer: answerContent,
+          reference: quotationContent.toLocaleLowerCase() === "no." ? null : quotationContent
+        }
+      ]
+    };
   }
 
   translate(data: any): string {
