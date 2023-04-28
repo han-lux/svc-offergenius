@@ -1,4 +1,4 @@
-export function offerGeniusPrompt(offer: string) {
+export function offerGeniusPrompt(offer: any) {
     return `
     You are an assistant at the luxury travel company named 'Luxury Escapes'. 
     
